@@ -1,17 +1,16 @@
 # climate_group
 
-STATUS: [UN-MAINTAINED]. Due to personal reasons I am not using this integration anymore. I do not have the time to actively maintain it. Feel free to fork/take-over. 
-I had made in try to get it merged into home assistant: https://github.com/home-assistant/core/pull/77737 but never got around to finish it. 
+thanks to @daenny for the initial version as he has no time any more I made some changes in order to get it working gain on HA core 2024.1.0
 
 Home Assistant Climate Group
 
 Groups multiple climate devices to a single entity. Useful if you have for instance multiple radiator thermostats in a room and want to control them all together.
-Inspired/copied from light_group component (https://github.com/home-assistant/home-assistant/blob/dev/homeassistant/components/group/light.py)
+Inspired/copied from light_group component [HA LIGHT](https://github.com/home-assistant/home-assistant/blob/dev/homeassistant/components/group/light.py)
 
 ## How to install:
 
 ### HACS
-Add this repo (https://github.com/daenny/climate_group) to the HACS store and install from there.
+Add this repo [HACS](https://github.com/acdcnow/climate_group) to the HACS store and install from there.
 
 ### local install
 Put in "custom_components" folder located in hass.io inside the config folder.
