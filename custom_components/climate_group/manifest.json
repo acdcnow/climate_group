@@ -1,10 +1,10 @@
 {
   "domain": "climate_group",
   "name": "Climate Group",
-  "version": "1.0.0",
-  "documentation": "https://github.com/daenny/climate_group",
+  "version": "1.0.1",
+  "documentation": "https://github.com/acdcnow/climate_group",
   "dependencies": [],
-  "codeowners": ["@daenny"],
+  "codeowners": ["@daenny", "@acdcnow"],
   "requirements": [],
-  "homeassistant": "2022.11.0"
+  "homeassistant": "2024.01.0"
 }
