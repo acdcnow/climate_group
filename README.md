@@ -12,7 +12,7 @@ Inspired/copied from light_group component [HA LIGHT](https://github.com/home-as
 ### HACS
 Add this repo [HACS](https://github.com/acdcnow/climate_group) to the HACS store and install from there.
 
-[HA HACK QUICK LINK](https://my.home-assistant.io/redirect/hacs_repository/?owner=acdcnow&repository=HA_audi_connect_q4&category=Integration)
+[HA HACK QUICK LINK](https://my.home-assistant.io/redirect/hacs_repository/?owner=acdcnow&repository=climate_group&category=Integration)
 
 ### local install
 Put in "custom_components" folder located in hass.io inside the config folder.
