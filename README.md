@@ -1,3 +1,8 @@
+# THIS REPO IS ARCHIVED, NEW VERSION AVAILABLE!
+
+Please use: https://github.com/bjrnptrsn/climate_group
+
+
 # climate_group
 
 thanks to @daenny for the initial version as he has no time any more I made some changes in order to get it working gain on HA core 2024.1.0
