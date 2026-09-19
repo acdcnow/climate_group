@@ -1,10 +1,13 @@
 {
   "domain": "climate_group",
   "name": "Climate Group",
-  "version": "1.0.1",
+  "codeowners": ["@acdcnow"],
+  "config_flow": true,
+  "dependencies": ["climate"],
   "documentation": "https://github.com/acdcnow/climate_group",
-  "dependencies": [],
-  "codeowners": ["@daenny", "@acdcnow"],
+  "integration_type": "helper",
+  "iot_class": "calculated",
+  "issue_tracker": "https://github.com/acdcnow/climate_group/issues",
   "requirements": [],
-  "homeassistant": "2024.1.0"
+  "version": "2.0.0-beta.1"
 }

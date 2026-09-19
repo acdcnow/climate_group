@@ -1,6 +1,5 @@
 {
-  "domains": ["climate"],
-  "name": "Climate Group",
-  "render_readme": true,
-  "homeassistant": "0.96.0"
+  "content_in_root": false,
+  "homeassistant": "2026.9.0",
+  "name": "Climate Group"
 }

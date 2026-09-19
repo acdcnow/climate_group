@@ -1,0 +1,56 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Klimagruppe",
+        "description": "Wähle die Klimaentitäten aus, die gemeinsam gesteuert werden sollen.",
+        "data": {
+          "name": "Name",
+          "entities": "Klimaentitäten",
+          "temperature_unit": "Temperatureinheit"
+        },
+        "data_description": {
+          "name": "Name der Gruppe. Er wird auch für die Entitäts-ID verwendet.",
+          "entities": "Die Gruppe steuert alle ausgewählten Entitäten gleichzeitig.",
+          "temperature_unit": "Einheit, in der die Gruppe Temperaturen meldet. Belasse sie beim Einheitensystem von Home Assistant, außer deine Thermostate melden eine andere Einheit."
+        }
+      }
+    },
+    "error": {
+      "invalid_entities": "Es können nur Klimaentitäten gruppiert werden.",
+      "no_entities": "Wähle mindestens eine Klimaentität aus.",
+      "no_name": "Gib der Gruppe einen Namen.",
+      "no_self_reference": "Eine Klimagruppe kann sich nicht selbst enthalten."
+    },
+    "abort": {
+      "already_configured": "Eine Klimagruppe mit diesem Namen existiert bereits."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Klimagruppe",
+        "description": "Ändere den Namen, die Mitglieder oder die Temperatureinheit dieser Klimagruppe.",
+        "data": {
+          "name": "Name",
+          "entities": "Klimaentitäten",
+          "temperature_unit": "Temperatureinheit"
+        },
+        "data_description": {
+          "name": "Name der Gruppe. Er wird auch für die Entitäts-ID verwendet.",
+          "entities": "Die Gruppe steuert alle ausgewählten Entitäten gleichzeitig.",
+          "temperature_unit": "Einheit, in der die Gruppe Temperaturen meldet. Belasse sie beim Einheitensystem von Home Assistant, außer deine Thermostate melden eine andere Einheit."
+        }
+      }
+    },
+    "error": {
+      "invalid_entities": "Es können nur Klimaentitäten gruppiert werden.",
+      "no_entities": "Wähle mindestens eine Klimaentität aus.",
+      "no_name": "Gib der Gruppe einen Namen.",
+      "no_self_reference": "Eine Klimagruppe kann sich nicht selbst enthalten."
+    },
+    "abort": {
+      "already_configured": "Eine Klimagruppe mit diesem Namen existiert bereits."
+    }
+  }
+}
