@@ -12,7 +12,7 @@ The group entity behaves like any other thermostat: it shows the average room
 temperature, the average setpoint and the mode your devices are in, and every
 service call is forwarded to all members.
 
-**This version (2.0.0-beta.1) requires Home Assistant 2026.9.0 or newer.**
+**This version (2.0.0-beta.2) requires Home Assistant 2026.9.0 or newer.**
 
 ## Features
 
@@ -65,14 +65,15 @@ of your Home Assistant installation, so that it ends up in
 
 The name is used to build the entity ID, e.g. the name *Living Room* creates
 `climate.living_room`. The options flow (*Configure* on the integration entry)
-changes the name, the members and the temperature unit afterwards; changing the
-options reloads the group automatically.
+changes the name, the members, the temperature unit and the setpoint rounding
+afterwards; changing the options reloads the group automatically.
 
 | Option | Description |
 | --- | --- |
 | Name | Name of the group, also used for its entity ID. |
 | Climate entities | The members of the group. Only `climate.*` entities can be selected. |
 | Temperature unit | Unit in which the group reports temperatures. Keep the unit system of Home Assistant unless your thermostats report a different unit. |
+| Round setpoints to 0.5 | Enable this if your thermostats only accept setpoints in 0.5 steps. The group then rounds the target temperature and the target temperature range to the nearest half degree. |
 
 ### YAML (still supported)
 
@@ -83,6 +84,7 @@ climate:
     name: Climate Friendly Name
     temperature_unit: C   # optional, 'C' or 'F', defaults to the unit system
     unique_id: living_room_climate_group   # optional
+    decimal_accuracy_to_half: true         # optional, rounds setpoints to 0.5
     entities:
       - climate.clima1
       - climate.clima2
@@ -95,10 +97,25 @@ climate:
 | `entities` | yes | List of `climate.*` entities, validated by the schema. |
 | `temperature_unit` | no | `C` or `F`, defaults to the unit system of Home Assistant. |
 | `unique_id` | no | Sets a fixed unique ID, useful for the entity registry. |
+| `decimal_accuracy_to_half` | no | `true` or `false`, defaults to `false`. Rounds the setpoints of the group to 0.5, see below. |
 
 > Tip: a YAML group and a UI group can coexist, but the UI is the way forward –
 > deleting the YAML block and adding the group in the UI gives the same entity
 > name and therefore keeps the same entity ID.
+
+### Coming from another climate_group fork?
+
+Existing YAML configurations of the other `climate_group` forks (for example
+[bjrnptrsn/climate_group](https://github.com/bjrnptrsn/climate_group)) keep
+working, there is nothing to remove or rename: `name`, `temperature_unit`,
+`unique_id`, `entities` and `decimal_accuracy_to_half` are all accepted. The
+same options can also be set in the UI.
+
+With `decimal_accuracy_to_half` enabled the group rounds the target temperature
+and the target temperature range to the nearest half degree, both in the state
+it reports and in the calls it forwards to the members, so the group and the
+devices never disagree about the setpoint. Room temperature measurements are not
+rounded.
 
 ## How the group behaves
 
@@ -109,6 +126,7 @@ climate:
 | Target temperature range | Mean of `target_temp_low` / `target_temp_high` of all members that report them. |
 | Min / max temperature | The highest `min_temp` and the lowest `max_temp`, so the group only offers a range every member accepts. If the members have no common range, the defaults (7–35 °C) are used. |
 | Target temperature step | The coarsest step reported by the members. |
+| Setpoint rounding | With `decimal_accuracy_to_half` enabled, the target temperature and the target temperature range are rounded to the nearest 0.5, both when they are reported and when they are forwarded. |
 | HVAC mode | The most common mode of the members, ignoring `off` while at least one member is active. `off` if all members are off. |
 | HVAC action | The most common action, ignoring `off` while at least one member is active. |
 | Available HVAC modes | Union of the modes of all members, with `off` first. |
@@ -163,6 +181,12 @@ entity IDs that Home Assistant uses for a single entity:
 - **A mode service reports an error for a single member.** The member does not
   support that mode; that is what the entity does on its own, the group cannot
   change it.
+- **The group shows a setpoint the members never report.** `decimal_accuracy_to_half`
+  is enabled and the members report a finer step, so the group rounds their
+  average. Disable the option if your thermostats accept tenths of a degree.
+- **`decimal_accuracy_to_half` is reported as an invalid option.** The running
+  version is older than 2.0.0-beta.2 or still the 1.0.1 release; update the
+  integration.
 
 ## Credits
 

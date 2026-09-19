@@ -7,12 +7,14 @@
         "data": {
           "name": "Name",
           "entities": "Climate entities",
-          "temperature_unit": "Temperature unit"
+          "temperature_unit": "Temperature unit",
+          "decimal_accuracy_to_half": "Round setpoints to 0.5"
         },
         "data_description": {
           "name": "Name of the group. It is also used to build its entity ID.",
           "entities": "The group controls all selected entities at the same time.",
-          "temperature_unit": "Unit the group reports temperatures in. Keep the unit system of Home Assistant unless your thermostats report a different unit."
+          "temperature_unit": "Unit the group reports temperatures in. Keep the unit system of Home Assistant unless your thermostats report a different unit.",
+          "decimal_accuracy_to_half": "Enable this if your thermostats only accept setpoints in 0.5 steps. The group rounds the target temperature and the target temperature range to the nearest half degree before it shows and forwards them."
         }
       }
     },
@@ -34,12 +36,14 @@
         "data": {
           "name": "Name",
           "entities": "Climate entities",
-          "temperature_unit": "Temperature unit"
+          "temperature_unit": "Temperature unit",
+          "decimal_accuracy_to_half": "Round setpoints to 0.5"
         },
         "data_description": {
           "name": "Name of the group. It is also used to build its entity ID.",
           "entities": "The group controls all selected entities at the same time.",
-          "temperature_unit": "Unit the group reports temperatures in. Keep the unit system of Home Assistant unless your thermostats report a different unit."
+          "temperature_unit": "Unit the group reports temperatures in. Keep the unit system of Home Assistant unless your thermostats report a different unit.",
+          "decimal_accuracy_to_half": "Enable this if your thermostats only accept setpoints in 0.5 steps. The group rounds the target temperature and the target temperature range to the nearest half degree before it shows and forwards them."
         }
       }
     },

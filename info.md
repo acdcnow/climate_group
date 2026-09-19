@@ -3,7 +3,7 @@
 Groups multiple climate entities into a single thermostat entity – for example
 all radiator thermostats of one room, or several zones of a heat pump.
 
-**Version 2.0.0-beta.1 · requires Home Assistant 2026.9.0 or newer**
+**Version 2.0.0-beta.2 · requires Home Assistant 2026.9.0 or newer**
 
 ## What it does
 
@@ -34,16 +34,19 @@ Beta versions are only offered when *Show beta versions* is enabled in HACS.
 | Name | Name of the group, also used for the entity ID (`Living Room` → `climate.living_room`). |
 | Climate entities | The members of the group. |
 | Temperature unit | Unit the group reports temperatures in. Keep the Home Assistant unit system unless your devices report another unit. |
+| Round setpoints to 0.5 | Enable this if your thermostats only accept setpoints in 0.5 steps. |
 
 The options can be changed any time with *Configure* on the integration entry,
 which reloads the group automatically.
 
-YAML configuration is still supported:
+YAML configuration is still supported, including the keys of the other
+`climate_group` forks (`unique_id`, `decimal_accuracy_to_half`):
 
 ```yaml
 climate:
   - platform: climate_group
     name: Living Room
+    decimal_accuracy_to_half: true
     entities:
       - climate.clima1
       - climate.clima2

@@ -561,6 +561,58 @@ def test_turn_on_falls_back_to_a_hvac_mode() -> None:
     )
 
 
+def test_decimal_accuracy_rounds_setpoints() -> None:
+    """The half degree option rounds the setpoints of the group."""
+    global hass
+    hass = ha_stub.reset_hass()
+    climate_state("climate.a", "heat", temperature=21.3, target_temp_low=18.2,
+                  target_temp_high=21.8, current_temperature=19.37)
+    climate_state("climate.b", "heat", temperature=21.4, target_temp_low=18.4,
+                  target_temp_high=22.0, current_temperature=19.37)
+
+    plain = make_group(["climate.a", "climate.b"])
+    close(plain.target_temperature, 21.35, "not rounded without the option")
+    close(plain.target_temperature_low, 18.3, "low not rounded without the option")
+
+    rounded = make_group(["climate.a", "climate.b"])
+    rounded._decimal_accuracy_to_half = True
+    rounded.async_update_group_state()
+    close(rounded.target_temperature, 21.5, "target rounded to half degrees")
+    close(rounded.target_temperature_low, 18.5, "low rounded to half degrees")
+    close(rounded.target_temperature_high, 22.0, "high is rounded too")
+    close(
+        rounded.current_temperature,
+        19.37,
+        "the measured temperature is not rounded",
+    )
+
+    # The value is rounded before it is forwarded to the members.
+    hass.services.calls.clear()
+    run(rounded.async_set_temperature(temperature=21.34))
+    close(
+        only_call(service="set_temperature")["data"]["temperature"],
+        21.5,
+        "forwarded setpoint is rounded",
+    )
+
+    hass.services.calls.clear()
+    run(plain.async_set_temperature(temperature=21.34))
+    close(
+        only_call(service="set_temperature")["data"]["temperature"],
+        21.34,
+        "forwarded setpoint is not rounded without the option",
+    )
+
+
+def test_round_to_half() -> None:
+    """The rounding helper snaps to the nearest half degree."""
+    equal(const.round_to_half(21.3), 21.5, "21.3 -> 21.5")
+    equal(const.round_to_half(21.2), 21.0, "21.2 -> 21.0")
+    equal(const.round_to_half(21.0), 21.0, "21.0 stays")
+    equal(const.round_to_half(21.75), 22.0, "21.75 -> 22.0")
+    equal(const.round_to_half(-3.24), -3.0, "negative values are rounded too")
+
+
 # --------------------------------------------------------------------------
 # setup
 # --------------------------------------------------------------------------
@@ -578,11 +630,17 @@ def test_yaml_setup() -> None:
             "platform": "climate_group",
             "name": "Living Room",
             "temperature_unit": "C",
+            "decimal_accuracy_to_half": True,
             "entities": ["climate.a", "climate.b"],
         }
     )
     equal(config["temperature_unit"], CELSIUS, "short unit is normalized")
     equal(config["entities"], ["climate.a", "climate.b"], "entities")
+    equal(
+        config["decimal_accuracy_to_half"],
+        True,
+        "the option of the other climate_group forks is accepted",
+    )
 
     try:
         schema(
@@ -598,6 +656,11 @@ def test_yaml_setup() -> None:
 
     default = schema({"platform": "climate_group", "entities": ["climate.a"]})
     equal(default["name"], const.DEFAULT_NAME, "default name")
+    equal(
+        default["decimal_accuracy_to_half"],
+        False,
+        "the option is off by default",
+    )
 
     added: list[Any] = []
     run(
@@ -606,6 +669,7 @@ def test_yaml_setup() -> None:
             {
                 "name": "Living Room",
                 "unique_id": "living-room",
+                "decimal_accuracy_to_half": True,
                 "entities": ["climate.a"],
             },
             added.extend,
@@ -617,6 +681,7 @@ def test_yaml_setup() -> None:
     equal(entity.unique_id, "living-room", "unique id")
     equal(entity._entity_ids, ["climate.a"], "entities")
     equal(entity.temperature_unit, CELSIUS, "unit from the unit system")
+    equal(entity._decimal_accuracy_to_half, True, "option from YAML")
 
 
 def test_config_entry_setup() -> None:
@@ -638,11 +703,17 @@ def test_config_entry_setup() -> None:
     entity = added[0]
     equal(entity.unique_id, "entry-1", "the entry id is the unique id")
     equal(entity.name, "From data", "name from data")
+    equal(
+        entity._decimal_accuracy_to_half,
+        False,
+        "option defaults to off for entries without it",
+    )
 
     entry.options = {
         "name": "From options",
         "entities": ["climate.b", "climate.c"],
         "temperature_unit": FAHRENHEIT,
+        "decimal_accuracy_to_half": True,
     }
     added = []
     run(climate.async_setup_entry(hass, entry, added.extend))
@@ -650,6 +721,7 @@ def test_config_entry_setup() -> None:
     equal(entity.name, "From options", "name from options")
     equal(entity._entity_ids, ["climate.b", "climate.c"], "entities from options")
     equal(entity.temperature_unit, FAHRENHEIT, "unit from options")
+    equal(entity._decimal_accuracy_to_half, True, "option from options")
 
 
 def test_forwarding_and_unloading() -> None:
@@ -713,6 +785,11 @@ def test_config_flow_creates_a_group() -> None:
     equal(defaults["name"], const.DEFAULT_NAME, "default name")
     equal(defaults["entities"], [], "no entity is preselected")
     equal(defaults["temperature_unit"], CELSIUS, "default unit is the unit system")
+    equal(
+        defaults["decimal_accuracy_to_half"],
+        False,
+        "rounding is off by default",
+    )
 
     result = run(
         flow.async_step_user(
@@ -720,6 +797,7 @@ def test_config_flow_creates_a_group() -> None:
                 "name": "  Living Room  ",
                 "entities": ["climate.a", "climate.b", "climate.a"],
                 "temperature_unit": CELSIUS,
+                "decimal_accuracy_to_half": True,
             }
         )
     )
@@ -731,6 +809,7 @@ def test_config_flow_creates_a_group() -> None:
             "name": "Living Room",
             "entities": ["climate.a", "climate.b"],
             "temperature_unit": CELSIUS,
+            "decimal_accuracy_to_half": True,
         },
         "entry data",
     )
@@ -864,6 +943,11 @@ def test_options_flow() -> None:
     defaults = schema_defaults(form["data_schema"])
     equal(defaults["name"], "Group", "name default")
     equal(defaults["entities"], ["climate.a"], "entity default")
+    equal(
+        defaults["decimal_accuracy_to_half"],
+        False,
+        "rounding default comes from the entry",
+    )
 
     # The group may not contain itself.
     form = run(
@@ -887,6 +971,7 @@ def test_options_flow() -> None:
                 "name": "New name",
                 "entities": ["climate.a", "climate.b"],
                 "temperature_unit": FAHRENHEIT,
+                "decimal_accuracy_to_half": True,
             }
         )
     )
@@ -897,6 +982,7 @@ def test_options_flow() -> None:
             "name": "New name",
             "entities": ["climate.a", "climate.b"],
             "temperature_unit": FAHRENHEIT,
+            "decimal_accuracy_to_half": True,
         },
         "option data",
     )

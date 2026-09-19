@@ -7,12 +7,14 @@
         "data": {
           "name": "Name",
           "entities": "Klimaentitäten",
-          "temperature_unit": "Temperatureinheit"
+          "temperature_unit": "Temperatureinheit",
+          "decimal_accuracy_to_half": "Sollwerte auf 0,5 runden"
         },
         "data_description": {
           "name": "Name der Gruppe. Er wird auch für die Entitäts-ID verwendet.",
           "entities": "Die Gruppe steuert alle ausgewählten Entitäten gleichzeitig.",
-          "temperature_unit": "Einheit, in der die Gruppe Temperaturen meldet. Belasse sie beim Einheitensystem von Home Assistant, außer deine Thermostate melden eine andere Einheit."
+          "temperature_unit": "Einheit, in der die Gruppe Temperaturen meldet. Belasse sie beim Einheitensystem von Home Assistant, außer deine Thermostate melden eine andere Einheit.",
+          "decimal_accuracy_to_half": "Aktiviere dies, wenn deine Thermostate nur Sollwerte in 0,5-Schritten akzeptieren. Die Gruppe rundet dann die Zieltemperatur und den Zieltemperaturbereich auf das nächste halbe Grad, bevor sie angezeigt und weitergegeben werden."
         }
       }
     },
@@ -34,12 +36,14 @@
         "data": {
           "name": "Name",
           "entities": "Klimaentitäten",
-          "temperature_unit": "Temperatureinheit"
+          "temperature_unit": "Temperatureinheit",
+          "decimal_accuracy_to_half": "Sollwerte auf 0,5 runden"
         },
         "data_description": {
           "name": "Name der Gruppe. Er wird auch für die Entitäts-ID verwendet.",
           "entities": "Die Gruppe steuert alle ausgewählten Entitäten gleichzeitig.",
-          "temperature_unit": "Einheit, in der die Gruppe Temperaturen meldet. Belasse sie beim Einheitensystem von Home Assistant, außer deine Thermostate melden eine andere Einheit."
+          "temperature_unit": "Einheit, in der die Gruppe Temperaturen meldet. Belasse sie beim Einheitensystem von Home Assistant, außer deine Thermostate melden eine andere Einheit.",
+          "decimal_accuracy_to_half": "Aktiviere dies, wenn deine Thermostate nur Sollwerte in 0,5-Schritten akzeptieren. Die Gruppe rundet dann die Zieltemperatur und den Zieltemperaturbereich auf das nächste halbe Grad, bevor sie angezeigt und weitergegeben werden."
         }
       }
     },

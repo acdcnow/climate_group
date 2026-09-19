@@ -20,6 +20,7 @@ from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers import selector
 
 from .const import (
+    CONF_DECIMAL_ACCURACY_TO_HALF,
     DEFAULT_NAME,
     DOMAIN,
     TEMPERATURE_UNITS,
@@ -46,6 +47,11 @@ def _temperature_unit_selector() -> selector.SelectSelector:
             mode=selector.SelectSelectorMode.DROPDOWN,
         )
     )
+
+
+def _decimal_accuracy_selector() -> selector.BooleanSelector:
+    """Return a selector for the half degree rounding of the group."""
+    return selector.BooleanSelector()
 
 
 def _selected_entities(user_input: dict[str, Any]) -> list[str]:
@@ -128,6 +134,9 @@ def _entry_data(hass: HomeAssistant, user_input: dict[str, Any]) -> dict[str, An
         CONF_TEMPERATURE_UNIT: normalize_temperature_unit(
             user_input.get(CONF_TEMPERATURE_UNIT), hass
         ),
+        CONF_DECIMAL_ACCURACY_TO_HALF: bool(
+            user_input.get(CONF_DECIMAL_ACCURACY_TO_HALF, False)
+        ),
     }
 
 
@@ -147,6 +156,10 @@ def _schema(hass: HomeAssistant, defaults: dict[str, Any]) -> vol.Schema:
                 default=defaults.get(CONF_TEMPERATURE_UNIT)
                 or hass.config.units.temperature_unit,
             ): _temperature_unit_selector(),
+            vol.Required(
+                CONF_DECIMAL_ACCURACY_TO_HALF,
+                default=bool(defaults.get(CONF_DECIMAL_ACCURACY_TO_HALF, False)),
+            ): _decimal_accuracy_selector(),
         }
     )
 
@@ -206,6 +219,10 @@ class ClimateGroupOptionsFlow(OptionsFlowWithReload):
             ),
             CONF_TEMPERATURE_UNIT: entry.options.get(
                 CONF_TEMPERATURE_UNIT, entry.data.get(CONF_TEMPERATURE_UNIT)
+            ),
+            CONF_DECIMAL_ACCURACY_TO_HALF: entry.options.get(
+                CONF_DECIMAL_ACCURACY_TO_HALF,
+                entry.data.get(CONF_DECIMAL_ACCURACY_TO_HALF, False),
             ),
         }
 

@@ -12,6 +12,10 @@ DOMAIN: Final = "climate_group"
 
 DEFAULT_NAME: Final = "Climate Group"
 
+#: Round the setpoints of the group to half degrees. The key is the same as in
+#: the other climate_group forks, so their configuration keeps working.
+CONF_DECIMAL_ACCURACY_TO_HALF: Final = "decimal_accuracy_to_half"
+
 #: Features the group is able to aggregate and forward to its members.
 #: Features reported by members that are not listed here (e.g. humidity) are
 #: masked out, because the group has no meaningful way to handle them.
@@ -50,3 +54,13 @@ def normalize_temperature_unit(value: Any, hass: HomeAssistant) -> str:
     # The config flow and the YAML schema both validate the unit, so this is
     # only a safety net.
     return hass.config.units.temperature_unit
+
+
+def round_to_half(value: float) -> float:
+    """Round a temperature to the nearest half degree.
+
+    Thermostats that only accept setpoints in 0.5 steps cannot be set to e.g.
+    21.3 degrees, so the group rounds the value instead of showing a setpoint
+    the devices never report back.
+    """
+    return round(round(value * 2) / 2, 1)

@@ -1,0 +1,18 @@
+Support the decimal_accuracy_to_half option of the other forks
+
+A configuration written for bjrnptrsn/climate_group failed to load:
+
+  'decimal_accuracy_to_half' is an invalid option for
+  'climate_group.climate'
+
+The option is now accepted, both in YAML and in the UI (Round setpoints to
+0.5), and it rounds the target temperature and the target temperature range to
+the nearest half degree.
+
+Unlike the reference implementation, which only rounds the reported state, the
+rounding is also applied before a setpoint is converted and forwarded to the
+members, so the group and the devices do not disagree about the setpoint.
+Room temperature measurements are never rounded.
+
+Existing config entries keep working, the option defaults to false when it is
+not set.

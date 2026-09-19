@@ -4,6 +4,30 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [2.0.0-beta.2] - 2026-09-19
+
+Compatibility with the configuration of the other `climate_group` forks and a
+setpoint rounding that is consistent between the group and its members.
+
+### Added
+
+- The YAML key `decimal_accuracy_to_half` of the other `climate_group` forks
+  (for example [bjrnptrsn/climate_group](https://github.com/bjrnptrsn/climate_group))
+  is accepted, so an existing configuration loads again instead of failing with
+  "is an invalid option for climate_group.climate".
+- The same option is available in the UI as *Round setpoints to 0.5*, in the
+  setup form and in the options flow.
+- With the option enabled the group rounds the target temperature and the target
+  temperature range to the nearest half degree, both in the state it reports and
+  in the calls it forwards to the members. Room temperature measurements are not
+  rounded.
+
+### Fixed
+
+- The rounding is applied before the setpoint is converted into the unit system
+  of Home Assistant and forwarded, so a group in Fahrenheit sends a value the
+  members accept instead of the unrounded average.
+
 ## [2.0.0-beta.1] - 2026-09-19
 
 Modernized for Home Assistant 2026.9, configured in the UI, with brand images
@@ -87,5 +111,6 @@ and a set of fixes for the aggregation of the member states.
 - Initial release by [@daenny](https://github.com/daenny) as
   `custom_components/climate_group`.
 
+[2.0.0-beta.2]: https://github.com/acdcnow/climate_group/releases/tag/v2.0.0-beta.2
 [2.0.0-beta.1]: https://github.com/acdcnow/climate_group/releases/tag/v2.0.0-beta.1
 [1.0.1]: https://github.com/acdcnow/climate_group/releases/tag/V1.0.1

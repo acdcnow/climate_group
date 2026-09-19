@@ -521,6 +521,18 @@ def string(value: Any) -> str:
     return str(value)
 
 
+def boolean(value: Any) -> bool:
+    """Validate a boolean."""
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, str):
+        if value.lower() in ("true", "yes", "on", "1"):
+            return True
+        if value.lower() in ("false", "no", "off", "0"):
+            return False
+    raise vol.Invalid(f"Expected a boolean, got {value!r}")
+
+
 def entity_id(value: Any) -> str:
     """Validate an entity id."""
     value = string(value).lower()
@@ -582,6 +594,10 @@ class SelectSelectorConfig(dict):
     """Config of a select selector."""
 
 
+class BooleanSelectorConfig(dict):
+    """Config of a boolean selector."""
+
+
 class _Selector:
     """Base selector."""
 
@@ -610,6 +626,12 @@ class SelectSelector(_Selector):
     """Selector of a value from a list."""
 
     selector_type = "select"
+
+
+class BooleanSelector(_Selector):
+    """Selector of a boolean."""
+
+    selector_type = "boolean"
 
 
 # --------------------------------------------------------------------------
@@ -867,6 +889,7 @@ def install() -> HomeAssistant:
         package=False,
         PLATFORM_SCHEMA=PLATFORM_SCHEMA,
         PLATFORM_SCHEMA_BASE=PLATFORM_SCHEMA_BASE,
+        boolean=boolean,
         string=string,
         entity_id=entity_id,
         entities_domain=entities_domain,
@@ -889,6 +912,8 @@ def install() -> HomeAssistant:
     _register(
         "homeassistant.helpers.selector",
         package=False,
+        BooleanSelector=BooleanSelector,
+        BooleanSelectorConfig=BooleanSelectorConfig,
         EntitySelector=EntitySelector,
         EntitySelectorConfig=EntitySelectorConfig,
         SelectSelector=SelectSelector,

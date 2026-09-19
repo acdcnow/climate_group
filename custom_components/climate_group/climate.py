@@ -76,9 +76,11 @@ from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
 from homeassistant.util.unit_conversion import TemperatureConverter
 
 from .const import (
+    CONF_DECIMAL_ACCURACY_TO_HALF,
     DEFAULT_NAME,
     SUPPORTED_FEATURES,
     normalize_temperature_unit,
+    round_to_half,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -95,6 +97,7 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
         vol.Optional(CONF_NAME, default=DEFAULT_NAME): cv.string,
         vol.Optional(CONF_UNIQUE_ID): cv.string,
         vol.Optional(CONF_TEMPERATURE_UNIT): cv.temperature_unit,
+        vol.Optional(CONF_DECIMAL_ACCURACY_TO_HALF, default=False): cv.boolean,
         vol.Required(CONF_ENTITIES): cv.entities_domain(CLIMATE_DOMAIN),
     }
 )
@@ -152,6 +155,7 @@ async def async_setup_platform(
                 config[CONF_NAME],
                 config[CONF_ENTITIES],
                 normalize_temperature_unit(config.get(CONF_TEMPERATURE_UNIT), hass),
+                config.get(CONF_DECIMAL_ACCURACY_TO_HALF, False),
             )
         ]
     )
@@ -178,6 +182,10 @@ async def async_setup_entry(
                     ),
                     hass,
                 ),
+                options.get(
+                    CONF_DECIMAL_ACCURACY_TO_HALF,
+                    data.get(CONF_DECIMAL_ACCURACY_TO_HALF, False),
+                ),
             )
         ]
     )
@@ -196,10 +204,12 @@ class ClimateGroup(GroupEntity, ClimateEntity):
         name: str,
         entity_ids: list[str],
         temperature_unit: str,
+        decimal_accuracy_to_half: bool = False,
     ) -> None:
         """Initialize a climate group."""
         self._entity_ids = list(entity_ids)
         self._member_features: dict[str, ClimateEntityFeature] = {}
+        self._decimal_accuracy_to_half = bool(decimal_accuracy_to_half)
 
         self._attr_name = name
         self._attr_unique_id = unique_id
@@ -310,6 +320,23 @@ class ClimateGroup(GroupEntity, ClimateEntity):
 
         self._attr_min_temp = min_temp
         self._attr_max_temp = max_temp
+        # Members that only accept half degrees would report a setpoint back
+        # that differs from the one the group shows, so round it here.
+        self._attr_target_temperature = self._round_setpoint(
+            self._attr_target_temperature
+        )
+        self._attr_target_temperature_low = self._round_setpoint(
+            self._attr_target_temperature_low
+        )
+        self._attr_target_temperature_high = self._round_setpoint(
+            self._attr_target_temperature_high
+        )
+
+    def _round_setpoint(self, value: float | None) -> float | None:
+        """Round a setpoint to half degrees when the option is enabled."""
+        if value is None or not self._decimal_accuracy_to_half:
+            return value
+        return round_to_half(value)
 
     @callback
     def _update_hvac(self, states: list[State]) -> None:
@@ -469,6 +496,10 @@ class ClimateGroup(GroupEntity, ClimateEntity):
 
         for key, value in kwargs.items():
             if key in CONVERTIBLE_ATTRIBUTES:
+                if self._decimal_accuracy_to_half:
+                    # Round in the unit of the group, the members would
+                    # round the value on their own otherwise.
+                    value = round_to_half(value)
                 # Members are called with temperatures in the unit system of
                 # Home Assistant, not in the unit of the group.
                 data[key] = TemperatureConverter.convert(

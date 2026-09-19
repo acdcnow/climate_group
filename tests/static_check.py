@@ -16,7 +16,7 @@ ROOT = Path(__file__).resolve().parents[1]
 PKG = ROOT / "custom_components" / "climate_group"
 
 # The version of the integration and of the release that is published for it.
-VERSION = "2.0.0-beta.1"
+VERSION = "2.0.0-beta.2"
 MIN_HOME_ASSISTANT = "2026.9.0"
 
 # Home Assistant 2026.9 ships the group entity in this module.
@@ -260,6 +260,10 @@ def main() -> int:
     check(
         MIN_HOME_ASSISTANT in readme,
         "the readme mentions the minimum Home Assistant version",
+    )
+    check(
+        "decimal_accuracy_to_half" in readme and "decimal_accuracy_to_half" in source,
+        "the option that the other climate_group forks use is documented and accepted",
     )
 
     if FAILURES:
